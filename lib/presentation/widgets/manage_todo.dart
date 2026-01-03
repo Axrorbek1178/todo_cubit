@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:todo_cubit/data/models/todo.dart';
 import 'package:todo_cubit/logic/todo/todo_cubit.dart';
 
 class ManageTodo extends StatelessWidget {
-  ManageTodo({super.key});
+  final Todo? todo;
+  ManageTodo({super.key, this.todo});
 
   final _formKey = GlobalKey<FormState>();
   String _title = '';
@@ -12,7 +14,13 @@ class ManageTodo extends StatelessWidget {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       // Process data.
-      BlocProvider.of<TodoCubit>(context).addTodo(_title);
+      if (todo == null) {
+        context.read<TodoCubit>().addTodo(_title);
+      } else {
+        context.read<TodoCubit>().editTodo(
+          Todo(id: todo!.id, title: _title, isDone: todo!.isDone),
+        );
+      }
     }
   }
 
@@ -20,7 +28,7 @@ class ManageTodo extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<TodoCubit, TodoState>(
       listener: (context, state) {
-        if (state is TodoAdded) {
+        if (state is TodoAdded || state is TodoEdited) {
           Navigator.of(context).pop();
         } else if (state is TodoError) {
           showDialog(
@@ -51,6 +59,7 @@ class ManageTodo extends StatelessWidget {
                   border: OutlineInputBorder(),
                   labelText: "Title",
                 ),
+                initialValue: todo == null ? '' : todo!.title,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a title';
@@ -71,7 +80,7 @@ class ManageTodo extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () => _submit(context),
-                    child: const Text("Add"),
+                    child: Text(todo == null ? "Add" : "Edit"),
                   ),
                 ],
               ),

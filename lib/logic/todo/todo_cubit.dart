@@ -26,4 +26,31 @@ class TodoCubit extends Cubit<TodoState> {
       emit(TodoError("Error occurred", state.todos));
     }
   }
+
+  void editTodo(Todo todo) {
+    try {
+      final todos = state.todos;
+      final index = todos.indexWhere((t) => t.id == todo.id);
+      todos[index] = todo;
+      emit(TodoEdited(todos));
+      emit(TodoState(todos));
+    } catch (e) {
+      emit(TodoError("Error occurred", state.todos));
+    }
+  }
+
+  void toggleTodo(String id) {
+    final todos = state.todos;
+    final index = todos.indexWhere((t) => t.id == id);
+    todos[index].isDone = !todos[index].isDone;
+    emit(TodoToggled(todos));
+    emit(TodoState(todos));
+  }
+
+  void deleteTodo(String id) {
+    final todos = state.todos;
+    todos.removeWhere((todo) => todo.id == id);
+    emit(TodoDeleted(todos));
+    emit(TodoState(todos));
+  }
 }
