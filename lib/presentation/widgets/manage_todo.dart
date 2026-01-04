@@ -17,9 +17,7 @@ class ManageTodo extends StatelessWidget {
       if (todo == null) {
         context.read<TodoCubit>().addTodo(_title);
       } else {
-        context.read<TodoCubit>().editTodo(
-          Todo(id: todo!.id, title: _title, isDone: todo!.isDone),
-        );
+        context.read<TodoCubit>().editTodo(todo!.id, _title);
       }
     }
   }

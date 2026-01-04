@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchBar;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_cubit/logic/todo/todo_cubit.dart';
 import 'package:todo_cubit/presentation/widgets/manage_todo.dart';
 import 'package:todo_cubit/presentation/widgets/todo_list_item.dart';
+import 'package:todo_cubit/presentation/widgets/search_bar.dart';
 
 class TodosScreen extends StatelessWidget {
   const TodosScreen({super.key});
@@ -15,12 +16,21 @@ class TodosScreen extends StatelessWidget {
     );
   }
 
+  void openSearchBar(BuildContext context) {
+    showSearch(context: context, delegate: SearchBar());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text("Todos Screen"),
         actions: [
+          IconButton(
+            onPressed: () => openSearchBar(context),
+            icon: Icon(Icons.search),
+          ),
           IconButton(
             onPressed: () {
               openManageTodo(context);
@@ -32,9 +42,9 @@ class TodosScreen extends StatelessWidget {
       body: BlocBuilder<TodoCubit, TodoState>(
         builder: (context, state) {
           return ListView.builder(
-            itemCount: state.todos.length,
+            itemCount: state.todos!.length,
             itemBuilder: (context, index) =>
-                TodoListItem(todo: state.todos[index]),
+                TodoListItem(todo: state.todos![index]),
           );
         },
       ),

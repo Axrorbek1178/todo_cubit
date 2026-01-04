@@ -8,6 +8,7 @@ import 'package:todo_cubit/presentation/widgets/manage_todo.dart';
 class TodoListItem extends StatelessWidget {
   final Todo todo;
   const TodoListItem({super.key, required this.todo});
+
   void openManageTodo(BuildContext context) {
     showModalBottomSheet(
       isDismissible: false,
