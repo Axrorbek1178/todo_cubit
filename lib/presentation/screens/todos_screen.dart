@@ -5,8 +5,23 @@ import 'package:todo_cubit/presentation/widgets/manage_todo.dart';
 import 'package:todo_cubit/presentation/widgets/todo_list_item.dart';
 import 'package:todo_cubit/presentation/widgets/search_bar.dart';
 
-class TodosScreen extends StatelessWidget {
+class TodosScreen extends StatefulWidget {
   const TodosScreen({super.key});
+
+  @override
+  State<TodosScreen> createState() => _TodosScreenState();
+}
+
+class _TodosScreenState extends State<TodosScreen> {
+  var _init = false;
+  @override
+  void didChangeDependencies() {
+    if (!_init) {
+      context.read<TodoCubit>().getTodos();
+    }
+    _init = true;
+    super.didChangeDependencies();
+  }
 
   void openManageTodo(BuildContext context) {
     showModalBottomSheet(

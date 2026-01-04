@@ -2,22 +2,52 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 import 'package:todo_cubit/data/models/todo.dart';
+import 'package:todo_cubit/logic/user/user_cubit.dart';
 
 part 'todo_state.dart';
 
 class TodoCubit extends Cubit<TodoState> {
-  TodoCubit()
+  final UserCubit userCubit;
+  TodoCubit({required this.userCubit})
     : super(
         TodoInitial([
-          Todo(id: UniqueKey().toString(), title: "First Todo", isDone: false),
-          Todo(id: UniqueKey().toString(), title: "Second Todo", isDone: true),
-          Todo(id: UniqueKey().toString(), title: "Go Shopping", isDone: false),
+          Todo(
+            id: UniqueKey().toString(),
+            title: "First Todo",
+            isDone: false,
+            userId: 'user1',
+          ),
+          Todo(
+            id: UniqueKey().toString(),
+            title: "Second Todo",
+            isDone: true,
+            userId: 'user1',
+          ),
+          Todo(
+            id: UniqueKey().toString(),
+            title: "Go Shopping",
+            isDone: false,
+            userId: 'user2',
+          ),
         ]),
       );
 
+  void getTodos() {
+    // should filter by userId
+    final user = userCubit.currentUser;
+    final todos = state.todos!.where((todo) => todo.userId == user.id).toList();
+    emit(TodoState(todos: todos));
+  }
+
   void addTodo(String title) {
+    final user = userCubit.currentUser;
+
     try {
-      final todo = Todo(id: UniqueKey().toString(), title: title);
+      final todo = Todo(
+        id: UniqueKey().toString(),
+        title: title,
+        userId: user.id,
+      );
       final todos = [...state.todos!, todo];
       emit(TodoAdded());
       emit(TodoState(todos: todos));
@@ -30,7 +60,7 @@ class TodoCubit extends Cubit<TodoState> {
     try {
       final todos = state.todos!.map((t) {
         if (t.id == id) {
-          return Todo(id: id, title: title, isDone: t.isDone);
+          return Todo(id: id, title: title, isDone: t.isDone, userId: t.userId);
         }
         return t;
       }).toList();
@@ -44,7 +74,12 @@ class TodoCubit extends Cubit<TodoState> {
   void toggleTodo(String id) {
     final todos = state.todos!.map((todo) {
       if (todo.id == id) {
-        return Todo(id: todo.id, title: todo.title, isDone: !todo.isDone);
+        return Todo(
+          id: todo.id,
+          title: todo.title,
+          isDone: !todo.isDone,
+          userId: todo.userId,
+        );
       }
       return todo;
     }).toList();
